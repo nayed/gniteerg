@@ -9,7 +9,8 @@
   "author": "Nayed Saïd Ali",
   "license": "MIT",
   "dependencies": {
-    "hapi": "^13.3.0"
+    "hapi": "^13.3.0",
+    "inert": "^3.2.0"
   },
   "devDependencies": {
     "babel": "^6.5.2",

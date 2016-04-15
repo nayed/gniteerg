@@ -4,14 +4,31 @@ let server = new Hapi.Server()
 
 server.connection({ port: 3000 })
 
-server.route({
-    path: '/hi',
+server.ext('onRequest', (request, reply) => {
+    console.log(`Request received: ${request.path}`)
+    reply.continue()
+})
+
+server.register(require('inert'), (err) => {
+
+    if (err) {
+        throw err;
+    }
+
+    server.route({
+    path: '/',
     method: 'GET',
     handler: (request, reply) => {
-        reply('Hi people')
+        reply.file('templates/index.html')
     }
 })
 
-server.start(() => {
-    console.log("listing on " + server.info.uri)
-})
+    server.start((err) => {
+
+        if (err) {
+            throw err;
+        }
+
+        console.log(`listing on ${server.info.uri}`);
+    });
+});
