@@ -12,23 +12,34 @@ server.ext('onRequest', (request, reply) => {
 server.register(require('inert'), (err) => {
 
     if (err) {
-        throw err;
+        throw err
     }
 
     server.route({
-    path: '/',
-    method: 'GET',
-    handler: (request, reply) => {
-        reply.file('templates/index.html')
-    }
-})
+        path: '/',
+        method: 'GET',
+        handler: (request, reply) => {
+            reply.file('templates/index.html')
+        }
+    })
+
+    server.route({
+        path: '/assets/{path*}',
+        method: 'GET',
+        handler: {
+            directory: {
+                path: './public',
+                listing: false
+            }
+        }
+    })
 
     server.start((err) => {
 
         if (err) {
-            throw err;
+            throw err
         }
 
-        console.log(`listing on ${server.info.uri}`);
-    });
-});
+        console.log(`listing on ${server.info.uri}`)
+    })
+})
