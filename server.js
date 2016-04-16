@@ -10,7 +10,6 @@ server.ext('onRequest', (request, reply) => {
 })
 
 server.register(require('inert'), (err) => {
-
     if (err) {
         throw err
     }
@@ -34,8 +33,31 @@ server.register(require('inert'), (err) => {
         }
     })
 
-    server.start((err) => {
+    server.route({
+        path: '/cards/new',
+        method: 'GET',
+        handler: (request, reply) => {
+            reply.file('templates/new.html')
+        }
+    })
 
+    server.route({
+        path: '/cards/new',
+        method: 'POST',
+        handler: (request, reply) => {
+            reply.redirect('/cards')
+        }
+    })
+
+    server.route({
+        path: '/cards',
+        method: 'GET',
+        handler: (request, reply) => {
+            reply.file('templates/cards.html')
+        }
+    })
+
+    server.start((err) => {
         if (err) {
             throw err
         }
