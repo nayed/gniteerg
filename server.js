@@ -35,27 +35,28 @@ server.register(require('inert'), (err) => {
 
     server.route({
         path: '/cards/new',
-        method: 'GET',
-        handler: (request, reply) => {
-            reply.file('templates/new.html')
-        }
-    })
-
-    server.route({
-        path: '/cards/new',
-        method: 'POST',
-        handler: (request, reply) => {
-            reply.redirect('/cards')
-        }
+        method: ['GET', 'POST'],
+        handler: newCardHandler
     })
 
     server.route({
         path: '/cards',
         method: 'GET',
-        handler: (request, reply) => {
-            reply.file('templates/cards.html')
-        }
+        handler: cardsHandler
     })
+
+    function newCardHandler(request, reply) {
+        if(request.method === 'get') {
+            reply.file('templates/new.html')
+        }
+        else {
+            reply.redirect('/cards')
+        }
+    }
+
+    function cardsHandler(request, reply) {
+        reply.file('templates/cards.html')
+    }
 
     server.start((err) => {
         if (err) {
