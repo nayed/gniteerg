@@ -1,9 +1,10 @@
 import Hapi from 'hapi'
 import uuid from 'uuid'
+import fs from 'fs'
 
 let server = new Hapi.Server()
 
-let cards = {}
+let cards = loadCards()
 
 server.connection({ port: 3000 })
 
@@ -13,9 +14,7 @@ server.ext('onRequest', (request, reply) => {
 })
 
 server.register(require('vision'), (err) => {
-    if (err) {
-        throw err;
-    }
+    if (err) throw err
 
     server.views({
         engines: {
@@ -26,9 +25,7 @@ server.register(require('vision'), (err) => {
 })
 
 server.register(require('inert'), (err) => {
-    if (err) {
-        throw err
-    }
+    if (err) throw err
 
     server.route({
         path: '/',
@@ -69,7 +66,6 @@ server.register(require('inert'), (err) => {
 
     function newCardHandler(request, reply) {
         if(request.method === 'get') {
-            //reply.file('templates/new.html')
             reply.view('new')
         }
         else {
@@ -87,7 +83,7 @@ server.register(require('inert'), (err) => {
     }
 
     function cardsHandler(request, reply) {
-        reply.file('templates/cards.html')
+        reply.view('cards', {cards: cards})
     }
 
     function saveCard(card) {
@@ -98,13 +94,17 @@ server.register(require('inert'), (err) => {
 
     function deleteCardHandler(request, reply) {
         delete cards[request.params.id]
+        reply()
     }
 
     server.start((err) => {
-        if (err) {
-            throw err
-        }
+        if (err) throw err
 
         console.log(`listing on ${server.info.uri}`)
     })
 })
+
+function loadCards() {
+    let file = fs.readFileSync('./cards.json')
+    return JSON.parse(file.toString())
+}
