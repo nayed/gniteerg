@@ -66,7 +66,7 @@ server.register(require('inert'), (err) => {
 
     function newCardHandler(request, reply) {
         if(request.method === 'get') {
-            reply.view('new')
+            reply.view('new', { card_images: mapImages() })
         }
         else {
             let card = {
@@ -77,13 +77,13 @@ server.register(require('inert'), (err) => {
                 card_image: request.payload.card_image
             }
             saveCard(card)
-            console.log(cards)
+            console.log(card)
             reply.redirect('/cards')
         }
     }
 
     function cardsHandler(request, reply) {
-        reply.view('cards', {cards: cards})
+        reply.view('cards', { cards })
     }
 
     function saveCard(card) {
@@ -107,4 +107,8 @@ server.register(require('inert'), (err) => {
 function loadCards() {
     let file = fs.readFileSync('./cards.json')
     return JSON.parse(file.toString())
+}
+
+function mapImages() {
+    return fs.readdirSync('./public/images/cards')
 }
