@@ -12,6 +12,19 @@ server.ext('onRequest', (request, reply) => {
     reply.continue()
 })
 
+server.register(require('vision'), (err) => {
+    if (err) {
+        throw err;
+    }
+
+    server.views({
+        engines: {
+            html: require('handlebars')
+        },
+        path: './templates'
+    })
+})
+
 server.register(require('inert'), (err) => {
     if (err) {
         throw err
@@ -56,7 +69,8 @@ server.register(require('inert'), (err) => {
 
     function newCardHandler(request, reply) {
         if(request.method === 'get') {
-            reply.file('templates/new.html')
+            //reply.file('templates/new.html')
+            reply.view('new')
         }
         else {
             let card = {
