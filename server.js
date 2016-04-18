@@ -1,6 +1,7 @@
 import Hapi from 'hapi'
 import uuid from 'uuid'
 import fs from 'fs'
+import Joi from 'joi'
 
 let server = new Hapi.Server()
 
@@ -64,21 +65,34 @@ server.register(require('inert'), (err) => {
         handler: deleteCardHandler
     })
 
+    let cardSchema = Joi.object().keys({
+        name: Joi.string().min(3).max(50).required(),
+        recipient_email: Joi.string().email().required(),
+        sender_name: Joi.string().min(3).max(50).required(),
+        sender_email: Joi.string().email().required(),
+        card_image: Joi.string().regex(/.+\.(jpg|bmp|png|gif)\b/).required()
+    })
+
     function newCardHandler(request, reply) {
         if(request.method === 'get') {
             reply.view('new', { card_images: mapImages() })
         }
         else {
-            let card = {
-                name: request.payload.name,
-                recipient_email: request.payload.recipient_email,
-                sender_name: request.payload.sender_name,
-                sender_email: request.payload.sender_email,
-                card_image: request.payload.card_image
-            }
-            saveCard(card)
-            console.log(card)
-            reply.redirect('/cards')
+            Joi.validate(request.payload, cardSchema, (err, val) => {
+                if (err) return reply(err)
+
+                let card = {
+                    name: val.name,
+                    recipient_email: val.recipient_email,
+                    sender_name: val.sender_name,
+                    sender_email: val.sender_email,
+                    card_image: val.card_image
+                }
+
+                saveCard(card)
+                console.log(card)
+                reply.redirect('/cards')
+            })
         }
     }
 
