@@ -2,6 +2,8 @@ import Hapi from 'hapi'
 import uuid from 'uuid'
 import fs from 'fs'
 import Joi from 'joi'
+import Boom from 'boom'
+
 
 let server = new Hapi.Server()
 
@@ -11,6 +13,13 @@ server.connection({ port: 3000 })
 
 server.ext('onRequest', (request, reply) => {
     console.log(`Request received: ${request.path}`)
+    reply.continue()
+})
+
+server.ext('onPreResponse', (request, reply) => {
+    if (request.response.isBoom) {
+        return reply.view('error', request.response)
+    }
     reply.continue()
 })
 
@@ -79,7 +88,9 @@ server.register(require('inert'), (err) => {
         }
         else {
             Joi.validate(request.payload, cardSchema, (err, val) => {
-                if (err) return reply(err)
+                if (err) {
+                    return reply(Boom.badRequest(err.details[0].message))
+                }
 
                 let card = {
                     name: val.name,
